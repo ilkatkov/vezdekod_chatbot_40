@@ -1,7 +1,7 @@
 # Вездекод Чатбот by Илья Катков
 # https://vk.com/ilkatkov/
 # Сообщество с ботом - https://vk.com/vezdekod22_katkov
-# Задание 30
+# Задание 40
 
 # import modules
 import vk_api
@@ -112,12 +112,34 @@ def getUserStat(user_id):
     return {"likes": likes, "dislikes": dislikes}
 
 
+def getAllStat():
+    conn = sqlite3.connect("data.sqlite")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT COUNT(mark) FROM users_memes WHERE mark = 1")
+    likes = cursor.fetchall()[0][0]
+    cursor.execute(
+        "SELECT COUNT(mark) FROM users_memes WHERE mark = 0")
+    dislikes = cursor.fetchall()[0][0]
+    return {"likes": likes, "dislikes": dislikes}
+
+
 def memes_count():
     conn = sqlite3.connect("data.sqlite")
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(id) FROM memes")
     count = cursor.fetchall()[0][0]
     return count
+
+
+def top_memes():
+    limit = 9  # сколько мемов выводим в топе
+    conn = sqlite3.connect("data.sqlite")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT mem, COUNT(*) as likes FROM users_memes WHERE mark = 1 GROUP BY mem ORDER BY likes DESC LIMIT ?", [limit])
+    result = cursor.fetchall()
+    return result
 
 
 # ---SETTINGS VK---#
@@ -213,11 +235,20 @@ def bot_start():
                     vk.method("messages.send", {
                               "peer_id": user_id, "message": "Катков Илья\nhttps://vk.com/ilkatkov", "keyboard": author_keyboard, "random_id": random.randint(1, 2147483647)})
                 elif user_words == "статистика 📈":
-                    stat = getUserStat(user_id)
-                    likes = stat["likes"]
-                    dislikes = stat["dislikes"]
+                    user_stat = getUserStat(user_id)
+                    user_likes = user_stat["likes"]
+                    user_dislikes = user_stat["dislikes"]
+                    all_stat = getAllStat()
+                    all_likes = all_stat["likes"]
+                    all_dislikes = all_stat["dislikes"]
+                    memes = top_memes()
+                    msg = "Смешнявок вы оценили: " + str(user_likes + user_dislikes) + "\nЛайков: " + str(user_likes) + "\nДизлайков: " + str(user_dislikes) + "\n\nВсего оценок: " + str(
+                        all_likes + all_dislikes) + "\nВсего лайков: " + str(all_likes) + "\nВсего дизлайков: " + str(all_dislikes) + "\n\n ТОП " + str(len(memes)) + " Мемов:"
                     vk.method("messages.send", {
-                              "peer_id": user_id, "message": "Всего смешнявок вы оценили: " + str(likes + dislikes) + "\nЛайков: " + str(likes) + "\nДизлайков: " + str(dislikes), "keyboard": stat_keyboard, "random_id": random.randint(1, 2147483647)})
+                              "peer_id": user_id, "message": msg, "keyboard": stat_keyboard, "random_id": random.randint(1, 2147483647)})
+                    for mem in memes:
+                        vk.method("messages.send", {
+                            "peer_id": user_id, "message": "Лайков: " + str(mem[1]), "attachment": mem[0], "keyboard": stat_keyboard, "random_id": random.randint(1, 2147483647)})
                 elif user_words == "показать мем 🤣" or user_words == "ещё мемас 😂":
                     if len(seen_memes(user_id)) == memes_count:
                         vk.method("messages.send", {

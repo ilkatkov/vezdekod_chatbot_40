@@ -1,5 +1,6 @@
 # Вездекод Чатбот by Илья Катков
 # https://vk.com/ilkatkov/
+# Сообщество с ботом - https://vk.com/vezdekod22_katkov
 # Задание 10
 
 # import modules

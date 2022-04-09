@@ -1,7 +1,7 @@
 # Вездекод Чатбот by Илья Катков
 # https://vk.com/ilkatkov/
 # Сообщество с ботом - https://vk.com/vezdekod22_katkov
-# Задание 10
+# Задание 20
 
 # import modules
 import vk_api
@@ -24,8 +24,7 @@ def main():
                                  "offset": 0, "count": 20, "filter": "unanswered"})
             if messages["count"] >= 1:
                 user_id = messages["items"][0]["last_message"]["from_id"]
-                user_words = messages["items"][0]["last_message"]["text"].lower(
-                )
+                user_words = messages["items"][0]["last_message"]["text"].lower()
                 if user_words == "привет":
                     vk.method("messages.send", {
                               "peer_id": user_id, "message": "Привет вездекодерам!", "random_id": random.randint(1, 2147483647)})

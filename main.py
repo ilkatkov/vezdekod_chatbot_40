@@ -143,10 +143,10 @@ def top_memes():
 
 
 # ---SETTINGS VK---#
-token = "6bb80dcfd9c8329a03c620366157137d550ec388577582ff5d4d13927b72934164244b1551de74749d62b"  # api-key
+token = "api_key"  # api-key
 vk = vk_api.VkApi(token=token)
 vk._auth_token()
-admin = 142446929  # id админа в ВК
+admin = 777777777  # id админа в ВК
 memes_count = memes_count()
 # ---SETTINGS VK---#
 
